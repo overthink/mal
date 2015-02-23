@@ -1,4 +1,5 @@
 import sys
+import readline
 
 def READ(x):
     return x
@@ -13,8 +14,7 @@ def rep(x):
     return PRINT(EVAL(READ(x)))
 
 while True:
-    sys.stdout.write('> ')
-    val = sys.stdin.readline()
-    if val == '': break
-    val = val.rstrip('\n')
-    print rep(val)
+    val = raw_input('> ').rstrip()
+    if len(val) > 0:
+        print rep(val)
+
