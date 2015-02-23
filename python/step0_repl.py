@@ -1,33 +1,20 @@
-import sys, traceback
-import mal_readline
+import sys
 
-# read
-def READ(str):
-    return str
+def READ(x):
+    return x
 
-# eval
-def EVAL(ast, env):
-    # try it as an expression then a statement
-    try:
-        return eval(ast)
-    except SyntaxError:
-        exec compile(ast, '', 'single') in globals()
-        return None
+def EVAL(x):
+    return x
 
-# print
-def PRINT(exp):
-    return exp
+def PRINT(x):
+    return x
 
-# repl
-def REP(str):
-    return PRINT(EVAL(READ(str), {}))
+def rep(x):
+    return PRINT(EVAL(READ(x)))
 
-# repl loop
 while True:
-    try:
-        line = mal_readline.readline("user> ")
-        if line == None: break
-        if line == "": continue
-        print(REP(line))
-    except Exception as e:
-        print("".join(traceback.format_exception(*sys.exc_info())))
+    sys.stdout.write('> ')
+    val = sys.stdin.readline()
+    if val == '': break
+    val = val.rstrip('\n')
+    print rep(val)
