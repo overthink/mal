@@ -1,3 +1,4 @@
+"Mal reader"
 import re
 
 class MalSymbol:
@@ -5,7 +6,12 @@ class MalSymbol:
     def __init__(self, name):
         self.name = name
 
-Nil = MalSymbol("nil")
+NIL = MalSymbol("nil")
+
+class MalKeyword:
+    """Represent a keyword in Mal."""
+    def __init__(self, name):
+        self.name = name
 
 # compile this monster once
 _tpattern = re.compile('''[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)''')
@@ -28,7 +34,6 @@ def read_list(tokens):
 
 def read_string(token):
     "Read token as a string and return result."
-    # TODO: something reasonable
     return token[1:-1]
 
 _int_pattern = re.compile('''\d+''')
@@ -38,6 +43,8 @@ def read_atom(token):
         return int(token)
     elif token[0] == '"':
         return read_string(token)
+    elif token[0] == ':':
+        return MalKeyword(token)
     else:
         # symbol
         if token == "true":
@@ -46,7 +53,7 @@ def read_atom(token):
             return False
         elif token == "nil":
             # ? can nil just be a symbol?
-            return Nil
+            return NIL
         else:
             return MalSymbol(token)
 
@@ -62,9 +69,9 @@ def read_str(s):
     return read_form(tokenizer(s))
 
 if __name__ == '__main__':
-    ts = tokenizer("(foo true false bar Baz :xx :yyy (1 \"xyz foo\" 2 3 )\n  )")
+    ts = tokenizer('(foo true false bar Baz :xx :yyy (1 "xyz foo" 2 3 )\n  )')
     print read_form(ts)
-    ts = tokenizer("(foo :yyy (1 nil 2 \"string\" 3))")
+    ts = tokenizer('(foo :yyy (1 nil 2 "string" 3))')
     print read_form(ts)
-
+    print read_form(tokenizer('(1 "two" (33 :kw 44) nil my-sym)'))
 

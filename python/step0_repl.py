@@ -1,4 +1,3 @@
-import sys
 import readline
 
 def READ(x):
