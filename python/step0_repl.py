@@ -13,7 +13,7 @@ def rep(x):
     return PRINT(EVAL(READ(x)))
 
 while True:
-    val = raw_input('> ').rstrip()
+    val = raw_input('user> ').rstrip()
     if len(val) > 0:
         print rep(val)
 
