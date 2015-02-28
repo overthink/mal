@@ -2,6 +2,10 @@
 import re
 import collections
 
+class ReaderException(Exception):
+  """Won't cause the repl to crash, but aborts reading current form"""
+  pass
+
 class MalList:
   """Just a wrapper for a normal python list so I can treat these differently
   than vectors, which will use the plain old list."""
@@ -33,12 +37,12 @@ class MalKeyword:
         return self.name.__eq__(other)
 
 # compile this monster once
-_tpattern = re.compile(r'''[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)''')
-def tokenizer(s):
+TOKEN_PATTERN = re.compile(r'''[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]+)''')
+def tokenize(s):
     "Returns a list of tokens in s."
     # TODO: if need be this can be changed to return an instance of a
     # Reader-like object with methods like next, peek, etc.
-    return _tpattern.findall(s)
+    return TOKEN_PATTERN.findall(s)
 
 def read_list(tokens):
     "Reads tokens up to a ')' and return them all in a MalList."
@@ -83,17 +87,17 @@ def read_map(tokens):
 
 def read_string(token):
     "Read token as a string and return result."
-    # TODO: unescape??
     return token[1:-1].decode('string_escape')
 
 _int_pattern = re.compile('''\d+''')
 def read_atom(token):
     "Coerce token -- a string -- to appropriate type and return it."
+    assert len(token) > 0
     if _int_pattern.match(token):
         return int(token)
-    elif len(token) > 1 and  token[0] == '"':
+    elif token[0] == '"':
         return read_string(token)
-    elif len(token) > 1 and token[0] == ':':
+    elif token[0] == ':':
         return MalKeyword(token)
     else:
         # symbol
@@ -115,12 +119,16 @@ DISP = {"'": 'quote',
         '~@': 'splice-unquote'}
 
 def read_form(tokens):
+    if len(tokens) == 0:
+        return NIL
     t = tokens[0]
-    if len(t) > 0 and t[0] == '(':
+    assert len(t) > 0
+
+    if t[0] == '(':
         return read_list(tokens)
-    if len(t) > 0 and t[0] == '[':
+    if t[0] == '[':
         return read_vector(tokens)
-    if len(t) > 0 and t[0] == '{':
+    if t[0] == '{':
         return read_map(tokens)
 
     disp_val = DISP.get(t)
@@ -137,13 +145,20 @@ def read_form(tokens):
         return read_atom(tokens.pop(0))
 
 def read_str(s):
-    return read_form(tokenizer(s))
+    "Read s and return a list of forms read from it."
+    tokens = tokenize(s)
+    form = read_form(tokens)
+    #if len(tokens) > 0:
+    #  raise ReaderException('trailing tokens: ' + repr(tokens))
+    return form
 
 if __name__ == '__main__':
-    #ts = tokenizer('(foo true false bar Baz :xx :yyy (1 "xyz foo" 2 3 )\n  )')
+    #ts = tokenize('(foo true false bar Baz :xx :yyy (1 "xyz foo" 2 3 )\n  )')
     #print read_form(ts)
-    #ts = tokenizer('(foo :yyy (1 nil 2 "string" 3))')
+    #ts = tokenize('(foo :yyy (1 nil 2 "string" 3))')
     #print read_form(ts)
-    #print read_form(tokenizer('(1 "two" (33 :kw 44) nil my-sym)'))
-    print tokenizer("'1")
+    #print read_form(tokenize('(1 "two" (33 :kw 44) nil my-sym)'))
+    print tokenize("(def x 42) ; comment!")
+    print tokenize('')
+    print tokenize('(A b) (c d)')
 

@@ -15,12 +15,14 @@ def PRINT(form):
 def rep(x):
     return PRINT(EVAL(READ(x)))
 
-try:
-    while True:
+while True:
+    try:
         val = raw_input('user> ').rstrip()
         if len(val) > 0:
             print rep(val)
-except EOFError:
-    print "^D"
-    sys.exit(0)
+    except EOFError:
+        print "Bye for now!"
+        sys.exit(0)
+    except reader.ReaderException as e:
+        print "Error: " + str(e)
 
