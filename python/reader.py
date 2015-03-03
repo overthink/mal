@@ -21,7 +21,7 @@ class MalSymbol:
     def __hash__(self):
         return self.name.__hash__()
     def __eq__(self, other):
-        return self.name.__eq__(other)
+        return self.name.__eq__(other.name)
 
 NIL = MalSymbol("nil")
 
@@ -30,11 +30,11 @@ class MalKeyword:
     def __init__(self, name):
         self.name = name
     def __lt__(self, other):
-        return self.name.__lt__(other)
+        return self.name.__lt__(other.name)
     def __hash__(self):
         return self.name.__hash__()
     def __eq__(self, other):
-        return self.name.__eq__(other)
+        return self.name.__eq__(other.name)
 
 # compile this monster once
 TOKEN_PATTERN = re.compile(r'''[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]+)''')
@@ -88,8 +88,9 @@ def read_map(tokens):
             tokens.pop(0)
             break
         key = read_form(tokens)
-        if not isinstance(key, collections.Hashable):
-            raise ReaderException(str(type(key)) + " is not hashable and cannot be a map key")
+        # hmmm
+        #if not isinstance(key, collections.Hashable):
+        #    raise ReaderException(repr(key) + " is not hashable and cannot be a map key")
         if result.has_key(key):
             raise ReaderException("key {0} appears more than once in map".format(key))
         if len(tokens) > 0 and tokens[0] == '}':
