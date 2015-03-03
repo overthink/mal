@@ -46,54 +46,69 @@ def tokenize(s):
 
 def read_list(tokens):
     "Reads tokens up to a ')' and return them all in a MalList."
+    assert tokens[0] == '('
     tokens.pop(0) # discard leading '('
     results = []
+    balanced = False
     while len(tokens) > 0:
         if tokens[0] == ')':
+            balanced = True
             tokens.pop(0)
             break
         results.append(read_form(tokens))
+    if not balanced:
+        raise ReaderException("Parens not balanced")
     return MalList(results)
 
 def read_vector(tokens):
     "Reads tokens up to a ']' and return them all in a list."
+    assert tokens[0] == '['
     tokens.pop(0) # discard leading '['
     results = []
+    balanced = False
     while len(tokens) > 0:
         if tokens[0] == ']':
+            balanced = True
             tokens.pop(0)
             break
         results.append(read_form(tokens))
+    if not balanced:
+        raise ReaderException("vector brackets not balanced")
     return results
 
 def read_map(tokens):
     "Reads tokens up to a '}' and return them all in a list."
+    assert tokens[0] == '{'
     tokens.pop(0) # discard leading '{'
     result = {}
+    balanced = False
     while len(tokens) > 0:
         if tokens[0] == '}':
+            balanced = True
             tokens.pop(0)
             break
         key = read_form(tokens)
         if not isinstance(key, collections.Hashable):
-            raise Exception(str(type(key)) + " is not hashable and cannot be a map key")
+            raise ReaderException(str(type(key)) + " is not hashable and cannot be a map key")
         if result.has_key(key):
-            raise Exception("key {0} appears more than once in map".format(key))
-        if tokens[0] == '}':
-            raise Exception("maps must have even number of elements")
+            raise ReaderException("key {0} appears more than once in map".format(key))
+        if len(tokens) > 0 and tokens[0] == '}':
+            raise ReaderException("maps must have even number of elements")
         value = read_form(tokens)
         result[key] = value
+    if not balanced:
+        raise ReaderException("map braces not balanced")
     return result
 
 def read_string(token):
     "Read token as a string and return result."
     return token[1:-1].decode('string_escape')
 
-_int_pattern = re.compile('''\d+''')
+INT_PATTERN = re.compile('''\d+''')
 def read_atom(token):
     "Coerce token -- a string -- to appropriate type and return it."
     assert len(token) > 0
-    if _int_pattern.match(token):
+    if INT_PATTERN.match(token):
         return int(token)
     elif token[0] == '"':
         return read_string(token)
