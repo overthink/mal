@@ -92,7 +92,7 @@ def read_map(tokens):
         #if not isinstance(key, collections.Hashable):
         #    raise ReaderException(repr(key) + " is not hashable and cannot be a map key")
         if result.has_key(key):
-            raise ReaderException("key {0} appears more than once in map".format(key))
+          raise ReaderException("read: key {0} appears more than once in map".format(key))
         if len(tokens) > 0 and tokens[0] == '}':
             raise ReaderException("maps must have even number of elements")
         value = read_form(tokens)
