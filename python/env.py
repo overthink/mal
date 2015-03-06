@@ -17,6 +17,6 @@ class Env:
     def get(self, k):
         result = self.find(k)
         if result is None:
-            raise Exception("no value for key " + k)
+            raise Exception("no value for key {0}".format(k))
         return result
 
