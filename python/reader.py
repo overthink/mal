@@ -11,6 +11,10 @@ class MalList:
   than vectors, which will use the plain old list."""
   def __init__(self, value):
     self.value = value
+  def __len__(self):
+    return len(self.value)
+  def __getitem__(self, key):
+    return self.value[key]
 
 class MalSymbol:
     """Represent a symbol in Mal."""
@@ -21,9 +25,9 @@ class MalSymbol:
     def __hash__(self):
         return self.name.__hash__()
     def __eq__(self, other):
-        return self.name.__eq__(other.name)
+        return isinstance(other, MalSymbol) and self.name.__eq__(other.name)
 
-NIL = MalSymbol("nil")
+NIL = None
 
 class MalKeyword:
     """Represent a keyword in Mal."""
@@ -34,7 +38,7 @@ class MalKeyword:
     def __hash__(self):
         return self.name.__hash__()
     def __eq__(self, other):
-        return self.name.__eq__(other.name)
+        return isinstance(other, MalKeyword) and self.name.__eq__(other.name)
 
 # compile this monster once
 TOKEN_PATTERN = re.compile(r'''[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]+)''')

@@ -1,5 +1,6 @@
 """Mal printer"""
 import reader
+import types
 
 def pr_str(data, print_readably = True):
     "Return the data structure data as a string."
@@ -27,6 +28,9 @@ def pr_str(data, print_readably = True):
         return data.name
     elif isinstance(data, reader.MalKeyword):
         return data.name
+    elif isinstance(data, types.FunctionType):
+        #return '#' + repr(data.func_code)
+        return '#<function>'
     elif data == True:
         return "true"
     elif data == False:

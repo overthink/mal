@@ -1,8 +1,10 @@
 class Env:
     "Environment for holding mappings from symbols to MAL values."
-    def __init__(self, outer):
+    def __init__(self, outer, binds, exprs):
         self.outer = outer
         self.data = {}
+        for i in xrange(len(binds)):
+            self.set(binds[i], exprs[i])
 
     def set(self, k, v):
         self.data[k] = v
