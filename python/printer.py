@@ -19,8 +19,10 @@ def pr_str(data, print_readably = True):
         return str(data)
     elif isinstance(data, str):
         if print_readably:
+            data = data.replace('\\', '\\\\')
             data = data.replace('"', r'\"')
             data = data.replace('\n', r'\n')
+            data = data.replace('\t', r'\t')
             data = '"' + data + '"'
         return data
     elif data == reader.NIL:

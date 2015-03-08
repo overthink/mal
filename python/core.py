@@ -15,6 +15,18 @@ def s(name):
     "Return a MalSymbol named s."
     return reader.MalSymbol(name)
 
+def str(*args):
+    strs = []
+    for form in args:
+        strs.append(printer.pr_str(form, print_readably = False))
+    return ''.join(strs)
+
+def pr_str(*args):
+    strs = []
+    for form in args:
+        strs.append(printer.pr_str(form, print_readably = True))
+    return ' '.join(strs)
+
 def do_println(print_readably, args):
     first = True
     for form in args:
@@ -47,7 +59,7 @@ ns = {
     s('not'):     lambda x: falsey(x),
     s('println'): println,
     s('prn'):     prn,
-    s('pr-str'):  println,
-    s('str'):     println
+    s('pr-str'):  pr_str,
+    s('str'):     str
 }
 

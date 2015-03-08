@@ -35,6 +35,8 @@ class MalSymbol:
         return self.name.__hash__()
     def __eq__(self, other):
         return isinstance(other, MalSymbol) and self.name.__eq__(other.name)
+    def __str__(self):
+        return self.name
 
 NIL = None
 
@@ -48,6 +50,8 @@ class MalKeyword:
         return self.name.__hash__()
     def __eq__(self, other):
         return isinstance(other, MalKeyword) and self.name.__eq__(other.name)
+    def __str__(self):
+        return self.name
 
 # compile this monster once
 TOKEN_PATTERN = re.compile(r'''[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]+)''')
