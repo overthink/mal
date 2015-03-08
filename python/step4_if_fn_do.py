@@ -82,11 +82,10 @@ def EVAL(form, env):
                 args.append(reader.NIL)
             cond, then, else_ = args
             cond_e = EVAL(cond, env)
-            # remember that False == 0 in python... and in Mal 0 is truthy
-            if (isinstance(cond_e, bool) and cond_e == False) or cond_e == reader.NIL:
-                return EVAL(else_, env)
-            else:
+            if core.truthy(cond_e):
                 return EVAL(then, env)
+            else:
+                return EVAL(else_, env)
         elif first == s('fn*'):
             def closure(*args):
                 inner = Env(env, form.value[1], list(args))

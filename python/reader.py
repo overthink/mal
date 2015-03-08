@@ -15,6 +15,15 @@ class MalList:
     return len(self.value)
   def __getitem__(self, key):
     return self.value[key]
+  def __hash__(self):
+      return self.value.__hash__()
+  def __eq__(self, other):
+    if isinstance(other, MalList):
+      return self.value == other.value
+    elif isinstance(other, list):
+      return self.value == other
+    else:
+      return False
 
 class MalSymbol:
     """Represent a symbol in Mal."""

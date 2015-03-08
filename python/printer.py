@@ -7,11 +7,11 @@ def pr_str(data, print_readably = True):
     #print "-- pr_str: " + repr(data)
     #print "--   type: " + str(type(data))
     if isinstance(data, reader.MalList):
-        return '(' + ' '.join([pr_str(x) for x in data.value]) + ')'
+        return '(' + ' '.join([pr_str(x, print_readably) for x in data.value]) + ')'
     elif isinstance(data, list):
-        return '[' + ' '.join([pr_str(x) for x in data]) + ']'
+        return '[' + ' '.join([pr_str(x, print_readably) for x in data]) + ']'
     elif isinstance(data, dict):
-        return '{' + ' '.join([pr_str(k) + ' ' + pr_str(v) for k, v in data.items()]) + '}'
+        return '{' + ' '.join([pr_str(k, print_readably) + ' ' + pr_str(v, print_readably) for k, v in data.items()]) + '}'
     # check bools before ints since isinstance(True, bool) == True!
     elif isinstance(data, bool):
         return 'true' if data else 'false'
@@ -21,7 +21,8 @@ def pr_str(data, print_readably = True):
         if print_readably:
             data = data.replace('"', r'\"')
             data = data.replace('\n', r'\n')
-        return '"' + data + '"'
+            data = '"' + data + '"'
+        return data
     elif data == reader.NIL:
         return "nil"
     elif isinstance(data, reader.MalSymbol):
