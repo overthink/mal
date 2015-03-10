@@ -57,7 +57,6 @@ ns = {
     s('<='):      lambda a, b: a <= b,
     s('>'):       lambda a, b: a > b,
     s('>='):      lambda a, b: a >= b,
-    s('not'):     lambda x: falsey(x),
     s('println'): println,
     s('prn'):     prn,
     s('pr-str'):  pr_str,

@@ -109,6 +109,7 @@ def rep(x):
     return PRINT(EVAL(READ(x), REPL_ENV))
 
 while True:
+    rep('(def! not (fn* [x] (if x false true)))')
     try:
         val = raw_input('user> ').rstrip()
         if len(val) > 0:
