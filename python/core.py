@@ -35,6 +35,7 @@ def do_println(print_readably, args):
         first = False
         sys.stdout.write(printer.pr_str(form, print_readably))
     print('')
+    return None
 
 def println(*args):
     return do_println(False, args)
