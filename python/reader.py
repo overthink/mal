@@ -38,6 +38,15 @@ class MalSymbol:
     def __str__(self):
         return self.name
 
+class MalFn:
+    def __init__(self, fn, ast, params, env):
+        self.fn = fn
+        self.ast = ast
+        self.params = params
+        self.env = env
+    def __call__(self, *args):
+      return self.fn(*args)
+
 NIL = None
 
 class MalKeyword:

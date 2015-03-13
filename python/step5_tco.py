@@ -4,18 +4,12 @@ import traceback
 import reader
 import printer
 import core
+import types
 from env import Env
 
 class EvalException(Exception):
   """Won't cause the repl to crash, but aborts reading current form"""
   pass
-
-class MalFn:
-    def __init__(self, fn, ast, params, env):
-        self.fn = fn
-        self.ast = ast
-        self.params = params
-        self.env = env
 
 def s(name):
     "Return a MalSymbol named s."
@@ -98,7 +92,7 @@ def EVAL(ast, env):
                 def closure(*args):
                     inner = Env(env, params, list(args))
                     return EVAL(body, inner)
-                return MalFn(closure, body, params, env)
+                return reader.MalFn(closure, body, params, env)
             elif first == s('quote'):
                 return ast
             else:
@@ -106,7 +100,14 @@ def EVAL(ast, env):
                 evaluated = eval_ast(ast, env)
                 fn = evaluated[0]
                 args = evaluated[1:]
-                return fn(*args)
+                if isinstance(fn, types.FunctionType):
+                    return fn(*args)
+                elif isinstance(fn, reader.MalFn):
+                    # TCO
+                    ast = fn.ast
+                    env = Env(fn.env, fn.params, args)
+                else:
+                    raise EvalException("unexpected fn type: {0}".format(fn))
         else:
             return eval_ast(ast, env)
 
