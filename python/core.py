@@ -35,7 +35,7 @@ def do_println(print_readably, args):
         first = False
         sys.stdout.write(printer.pr_str(form, print_readably))
     print('')
-    return None
+    return reader.NIL
 
 def println(*args):
     return do_println(False, args)
@@ -43,23 +43,30 @@ def println(*args):
 def prn(*args):
     return do_println(True, args)
 
+def slurp(filename):
+    "Return contents of filename as string."
+    with open(filename, 'r') as f:
+        return f.read()
+
 ns = {
-    s('+'):       lambda a, b: a + b,
-    s('-'):       lambda a, b: a - b,
-    s('*'):       lambda a, b: a * b,
-    s('/'):       lambda a, b: int(a/b),
-    s('list'):    lambda *args: reader.MalList(list(args)),
-    s('list?'):   lambda x: isinstance(x, reader.MalList),
-    s('empty?'):  lambda xs: len(xs) == 0,
-    s('count'):   lambda xs: 0 if xs is None else len(xs),
-    s('='):       lambda a, b: a == b,
-    s('<'):       lambda a, b: a < b,
-    s('<='):      lambda a, b: a <= b,
-    s('>'):       lambda a, b: a > b,
-    s('>='):      lambda a, b: a >= b,
-    s('println'): println,
-    s('prn'):     prn,
-    s('pr-str'):  pr_str,
-    s('str'):     str
+    s('+'):           lambda a, b: a + b,
+    s('-'):           lambda a, b: a - b,
+    s('*'):           lambda a, b: a * b,
+    s('/'):           lambda a, b: int(a/b),
+    s('list'):        lambda *args: reader.MalList(list(args)),
+    s('list?'):       lambda x: isinstance(x, reader.MalList),
+    s('empty?'):      lambda xs: len(xs) == 0,
+    s('count'):       lambda xs: 0 if xs is None else len(xs),
+    s('='):           lambda a, b: a == b,
+    s('<'):           lambda a, b: a < b,
+    s('<='):          lambda a, b: a <= b,
+    s('>'):           lambda a, b: a > b,
+    s('>='):          lambda a, b: a >= b,
+    s('println'):     println,
+    s('prn'):         prn,
+    s('pr-str'):      pr_str,
+    s('str'):         str,
+    s('read-string'): reader.read_str,
+    s('slurp'):       slurp
 }
 

@@ -71,10 +71,8 @@ class MalKeyword:
 # compile this monster once
 TOKEN_PATTERN = re.compile(r'''[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]+)''')
 def tokenize(s):
-    "Returns a list of tokens in s."
-    # TODO: if need be this can be changed to return an instance of a
-    # Reader-like object with methods like next, peek, etc.
-    return TOKEN_PATTERN.findall(s)
+    "Returns a list of non-comment tokens in s."
+    return [x for x in TOKEN_PATTERN.findall(s) if x[0] != ';']
 
 def read_list(tokens):
     "Reads tokens up to a ')' and return them all in a MalList."
@@ -209,4 +207,5 @@ if __name__ == '__main__':
     print tokenize("(def x 42) ; comment!")
     print tokenize('')
     print tokenize('(A b) (c d)')
+    print tokenize(';comment (+ 1 2)')
 

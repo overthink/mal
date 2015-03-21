@@ -31,7 +31,7 @@ def pr_str(data, print_readably = True):
         return data.name
     elif isinstance(data, reader.MalKeyword):
         return data.name
-    elif isinstance(data, reader.MalFn):
+    elif isinstance(data, reader.MalFn) or isinstance(data, types.FunctionType):
         #return '#' + repr(data.func_code)
         return '#<function>'
     elif data == True:
