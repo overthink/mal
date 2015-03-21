@@ -47,7 +47,13 @@ class MalFn:
     def __call__(self, *args):
       return self.fn(*args)
 
-NIL = None
+class MalNil:
+    """Need a sentinel value to represent nil, and Python's None is not a good
+    candidate since it's hard to store in dictionaries.
+    """
+    pass
+
+NIL = MalNil()
 
 class MalKeyword:
     """Represent a keyword in Mal."""

@@ -127,5 +127,5 @@ while True:
         print "Bye for now!"
         sys.exit(0)
     except Exception as e:
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
 
