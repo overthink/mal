@@ -2,6 +2,7 @@ import sys
 import readline
 import traceback
 import reader
+from reader import MalList, MalSymbol, MalFn, NIL
 import printer
 import core
 import types
@@ -13,7 +14,7 @@ class EvalException(Exception):
 
 def s(name):
     "Return a MalSymbol named s."
-    return reader.MalSymbol(name)
+    return MalSymbol(name)
 
 REPL_ENV = Env(None, [], [])
 for sym, fn in core.ns.items():
@@ -21,12 +22,12 @@ for sym, fn in core.ns.items():
 REPL_ENV.set(s('eval'), lambda ast: EVAL(ast, REPL_ENV))
 
 def eval_ast(ast, env):
-    if isinstance(ast, reader.MalSymbol):
+    if isinstance(ast, MalSymbol):
         result = env.get(ast)
         if result is None:
             raise EvalException('could not find symbol: ' + ast.name)
         return result
-    elif isinstance(ast, reader.MalList):
+    elif isinstance(ast, MalList):
         return [EVAL(x, env) for x in ast.value]
     elif isinstance(ast, list):
         return [EVAL(x, env) for x in ast]
@@ -47,7 +48,7 @@ def READ(s):
 
 def EVAL(ast, env):
     while True:
-        if isinstance(ast, reader.MalList):
+        if isinstance(ast, MalList):
             first = ast.value[0]
             if first == s('def!'):
                 name = ast.value[1]
@@ -59,7 +60,7 @@ def EVAL(ast, env):
                 inner_env = Env(env, [], [])
                 bindings = ast.value[1]
                 # check for vector binding syntax
-                if isinstance(bindings, reader.MalList):
+                if isinstance(bindings, MalList):
                     bindings = bindings.value
                 expr = ast.value[2]
                 # iterate bindings, eval'ing and setting into new env
@@ -70,7 +71,7 @@ def EVAL(ast, env):
             elif first == s('do'):
                 exprs = ast.value[1:]
                 if len(exprs) == 0:
-                    ast = reader.NIL
+                    ast = NIL
                 else:
                     eval_ast(exprs[:-1], env)
                     ast = exprs[-1]
@@ -80,7 +81,7 @@ def EVAL(ast, env):
                     raise Exception("need 2 or 3 args for if")
                 if len(args) == 2:
                     # if no then clause, use nil
-                    args.append(reader.NIL)
+                    args.append(NIL)
                 cond, then, else_ = args
                 cond_e = EVAL(cond, env)
                 if core.truthy(cond_e):
@@ -93,7 +94,7 @@ def EVAL(ast, env):
                 def closure(*args):
                     inner = Env(env, params, list(args))
                     return EVAL(body, inner)
-                return reader.MalFn(closure, body, params, env)
+                return MalFn(closure, body, params, env)
             elif first == s('quote'):
                 return ast
             else:
@@ -103,7 +104,7 @@ def EVAL(ast, env):
                 args = evaluated[1:]
                 if isinstance(fn, types.FunctionType):
                     return fn(*args)
-                elif isinstance(fn, reader.MalFn):
+                elif isinstance(fn, MalFn):
                     # TCO
                     ast = fn.ast
                     env = Env(fn.env, fn.params, args)
@@ -118,16 +119,27 @@ def PRINT(form):
 def rep(x):
     return PRINT(EVAL(READ(x), REPL_ENV))
 
-while True:
+def main():
     rep('(def! not (fn* [x] (if x false true)))')
     rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) ")")))))')
-    try:
-        val = raw_input('user> ').rstrip()
-        if len(val) > 0:
-            print rep(val)
-    except EOFError:
-        print "Bye for now!"
-        sys.exit(0)
-    except Exception as e:
-        traceback.print_exc(file=sys.stderr)
+    # If we have args, assume the first is a file and load it, then exit.
+    # Otherwise REPL.  In all cases bind the rest of the args to *ARGV*.
+    restargs = sys.argv[1:]
+    REPL_ENV.set(s('*ARGV*'), MalList(restargs))
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        rep('(load-file "{0}")'.format(filename))
+    else:
+        while True:
+            try:
+                val = raw_input('user> ').rstrip()
+                if len(val) > 0:
+                    print rep(val)
+            except EOFError:
+                print "Bye for now!"
+                sys.exit(0)
+            except Exception as e:
+                traceback.print_exc(file=sys.stderr)
+
+main()
 
